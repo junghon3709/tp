@@ -125,6 +125,30 @@ public class TypicalPersons {
             .withMedicalHistory("")
             .build();
 
+    public static final Student FISH_NOT_IN_LIST = new StudentBuilder()
+            .withName("Fish")
+            .withPhone("18941908")
+            .withEmail("fish@thebottomofthesea.com")
+            .withAddress("Saltwater lakes")
+            .withEmergencyContact("4314123414141")
+            .withInvolvement("Swimming class")
+            .withFormClass("1T2")
+            .withGender("M")
+            .withMedicalHistory("Unable to live on land")
+            .build();
+
+    public static final Student CARP_NOT_IN_LIST = new StudentBuilder()
+            .withName("Carp")
+            .withPhone("18943411908")
+            .withEmail("carp@thebottomofthesea.com")
+            .withAddress("Freshwater lakes")
+            .withEmergencyContact("4123414141")
+            .withInvolvement("Swimming class")
+            .withFormClass("1T2")
+            .withGender("F")
+            .withMedicalHistory("Unable to live on land")
+            .build();
+
     public static final Teacher ALI = new TeacherBuilder()
             .withName("Ali Paula")
             .withPhone("94351253")
@@ -214,6 +238,15 @@ public class TypicalPersons {
             .withFormClass("2T1")
             .withGender("F")
             .withMedicalHistory("")
+            .build();
+
+    public static final Teacher EXTRA_TEACHER_NOT_IN_LIST = new TeacherBuilder()
+            .withName("Nur teacher")
+            .withPhone("9482442")
+            .withEmail("best@example.com")
+            .withGender("M")
+            .withInvolvement("Math HOD")
+            .withOfficeTable("7")
             .build();
 
     // Manually added - Person's details found in {@code CommandTestUtil}

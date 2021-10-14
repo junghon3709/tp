@@ -37,12 +37,11 @@ public class ModelManager implements Model {
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
-        history.push(this.addressBook);
+        history.push(new AddressBook(addressBook));
     }
 
     public ModelManager() {
         this(new AddressBook(), new UserPrefs());
-        history.push(this.addressBook);
     }
 
     //=========== UserPrefs ==================================================================================
@@ -85,8 +84,11 @@ public class ModelManager implements Model {
     @Override
     public void setAddressBook(ReadOnlyAddressBook addressBook) {
         this.addressBook.resetData(addressBook);
-        this.history.push(this.addressBook);
+        // fitting to our name, we need to create a new AddressBook here because else, the stack will store by
+        // reference, which is not what we want
+        this.history.push(new AddressBook(this.addressBook));
     }
+
 
     @Override
     public ReadOnlyAddressBook getAddressBook() {
@@ -102,21 +104,21 @@ public class ModelManager implements Model {
     @Override
     public void deletePerson(Person target) {
         addressBook.removePerson(target);
-        this.history.push(this.addressBook);
+        this.history.push(new AddressBook(this.addressBook));
     }
 
     @Override
     public void addPerson(Person person) {
         addressBook.addPerson(person);
         updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
-        this.history.push(this.addressBook);
+        this.history.push(new AddressBook(this.addressBook));
     }
 
     @Override
     public void setPerson(Person target, Person editedPerson) {
         requireAllNonNull(target, editedPerson);
         addressBook.setPerson(target, editedPerson);
-        this.history.push(this.addressBook);
+        this.history.push(new AddressBook(this.addressBook));
     }
 
     //=========== Filtered Person List Accessors =============================================================
@@ -133,8 +135,34 @@ public class ModelManager implements Model {
     @Override
     public void updateFilteredPersonList(Predicate<Person> predicate) {
         requireNonNull(predicate);
+        // we do not update history if we simply filter the list
         filteredPersons.setPredicate(predicate);
-        this.history.push(this.addressBook);
+    }
+
+    //=========== History =============================================================
+
+    /**
+     * Undos the last operation
+     *
+     * @return True if undo was a success, false otherwise
+     */
+    public boolean undo() {
+        if (history.size() <= 1) {
+            return false;
+        }
+        history.pop();
+        this.addressBook.resetData(history.lastElement());
+        return true;
+    }
+
+    @Override
+    public boolean hasEqualHistory(Model obj) {
+        if (!(obj instanceof ModelManager)) {
+            return false;
+        }
+
+        ModelManager other = (ModelManager) obj;
+        return history.equals(other.history);
     }
 
     @Override
@@ -151,10 +179,10 @@ public class ModelManager implements Model {
 
         // state check
         ModelManager other = (ModelManager) obj;
+
         return addressBook.equals(other.addressBook)
                 && userPrefs.equals(other.userPrefs)
-                && filteredPersons.equals(other.filteredPersons)
-                && history.equals(other.history);
+                && filteredPersons.equals(other.filteredPersons);
     }
 
 }

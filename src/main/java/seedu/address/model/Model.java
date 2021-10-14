@@ -70,6 +70,18 @@ public interface Model {
     void addPerson(Person person);
 
     /**
+     * Undos the previous action.
+     * @return True if undo is success, false otherwise
+     */
+    boolean undo();
+
+    /**
+     * Undos the previous action.
+     * @return true if other model has equal history, false otherwise
+     */
+    boolean hasEqualHistory(Model other);
+
+    /**
      * Replaces the given person {@code target} with {@code editedPerson}.
      * {@code target} must exist in the address book.
      * The person identity of {@code editedPerson} must not be the same as another existing person in the address book.

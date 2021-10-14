@@ -6,19 +6,23 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 
 /**
- * Clears the address book.
+ * Undos the previous operation in the model manager.
  */
 public class UndoCommand extends Command {
 
     public static final String COMMAND_WORD = "undo";
     public static final String MESSAGE_SUCCESS = "Previous action has been undone!";
-
+    public static final String MESSAGE_ALREADY_AT_OLDEST_CHANGE = "Already at oldest change!";
 
     @Override
     public CommandResult execute(Model model) {
         requireNonNull(model);
-        model.setAddressBook(new AddressBook());
-        return new CommandResult(MESSAGE_SUCCESS);
+        boolean success = model.undo();
+        if (success) {
+            return new CommandResult(MESSAGE_SUCCESS);
+        } else {
+            return new CommandResult(MESSAGE_ALREADY_AT_OLDEST_CHANGE);
+        }
     }
 }
 

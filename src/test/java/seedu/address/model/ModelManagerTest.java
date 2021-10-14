@@ -7,14 +7,22 @@ import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BENSON;
+import static seedu.address.testutil.TypicalPersons.BOB;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
+import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_STUDENT;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
+import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.FilterCommand;
+import seedu.address.logic.commands.student.AddStudentCommand;
+import seedu.address.model.person.InvolvementContainsKeywordsPredicate;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.testutil.AddressBookBuilder;
 
@@ -91,6 +99,63 @@ public class ModelManagerTest {
     @Test
     public void getFilteredPersonList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> modelManager.getFilteredPersonList().remove(0));
+    }
+
+    // Check that histories are equal, actual testing of the UNDO command is in the UndoCommandTest section.
+
+    @Test
+    public void historiesAreEqual_addingPeople_success() {
+        ModelManager modelManager = new ModelManagerBuilder().with(new AddStudentCommand(ALICE)).build();
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.ADD_ALICE));
+    }
+
+    @Test
+    public void historiesAreEqual_addingMultiplePeople_success() {
+        ModelManager modelManager =
+                new ModelManagerBuilder().with(new AddStudentCommand(ALICE)).with(new AddStudentCommand(BOB)).build();
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.ADD_MULTIPLE_PEOPLE));
+    }
+
+    @Test
+    public void historiesAreEqual_deletingPeople_success() {
+        ModelManager modelManager =
+                new ModelManagerBuilder()
+                        .with(new AddStudentCommand(ALICE))
+                        .with(new AddStudentCommand(BOB))
+                        .with(new DeleteCommand(INDEX_THIRD_STUDENT))
+                        .build();
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.ADD_MULTIPLE_PEOPLE));
+    }
+
+    @Test
+    public void historiesAreEqual_filteringPeople_success() {
+        // filtering people should not add on to the history
+        InvolvementContainsKeywordsPredicate firstPredicate =
+                new InvolvementContainsKeywordsPredicate(Collections.singletonList("first"));
+        ModelManager modelManager =
+                new ModelManagerBuilder()
+                        .with(new AddStudentCommand(ALICE))
+                        .with(new AddStudentCommand(BOB))
+                        .with(new DeleteCommand(INDEX_FIRST_STUDENT))
+                        .with(new FilterCommand(firstPredicate))
+                        .build();
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.DELETING_ALICE));
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.FITLER_BY_TAG));
+    }
+
+    @Test
+    public void historiesAreEqual_commandException_success() {
+        // if the command execution runs into a CommandException, the history of the ModelManager should not be updated
+        InvolvementContainsKeywordsPredicate firstPredicate =
+                new InvolvementContainsKeywordsPredicate(Collections.singletonList("first"));
+        ModelManager modelManager =
+                new ModelManagerBuilder()
+                        .with(new AddStudentCommand(ALICE))
+                        .with(new AddStudentCommand(BOB))
+                        .with(new DeleteCommand(INDEX_FIRST_STUDENT))
+                        .with(new FilterCommand(firstPredicate))
+                        .build();
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.DELETING_ALICE));
     }
 
     @Test
