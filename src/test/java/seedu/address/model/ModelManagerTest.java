@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 import static seedu.address.testutil.Assert.assertThrows;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
+import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_STUDENT;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 import static seedu.address.testutil.TypicalPersons.BOB;
-import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
-import static seedu.address.testutil.TypicalIndexes.INDEX_THIRD_STUDENT;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -140,7 +140,7 @@ public class ModelManagerTest {
                         .with(new FilterCommand(firstPredicate))
                         .build();
         assertTrue(modelManager.hasEqualHistory(TypicalModels.DELETING_ALICE));
-        assertTrue(modelManager.hasEqualHistory(TypicalModels.FITLER_BY_TAG));
+        assertTrue(modelManager.hasEqualHistory(TypicalModels.FILTER_BY_TAG));
     }
 
     @Test
