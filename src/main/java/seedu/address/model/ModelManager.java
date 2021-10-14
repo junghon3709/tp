@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.nio.file.Path;
+import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -22,6 +23,7 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final Stack<AddressBook> history = new Stack<>();
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -35,10 +37,12 @@ public class ModelManager implements Model {
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        history.push(this.addressBook);
     }
 
     public ModelManager() {
         this(new AddressBook(), new UserPrefs());
+        history.push(this.addressBook);
     }
 
     //=========== UserPrefs ==================================================================================
@@ -81,6 +85,7 @@ public class ModelManager implements Model {
     @Override
     public void setAddressBook(ReadOnlyAddressBook addressBook) {
         this.addressBook.resetData(addressBook);
+        this.history.push(this.addressBook);
     }
 
     @Override
@@ -97,19 +102,21 @@ public class ModelManager implements Model {
     @Override
     public void deletePerson(Person target) {
         addressBook.removePerson(target);
+        this.history.push(this.addressBook);
     }
 
     @Override
     public void addPerson(Person person) {
         addressBook.addPerson(person);
         updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+        this.history.push(this.addressBook);
     }
 
     @Override
     public void setPerson(Person target, Person editedPerson) {
         requireAllNonNull(target, editedPerson);
-
         addressBook.setPerson(target, editedPerson);
+        this.history.push(this.addressBook);
     }
 
     //=========== Filtered Person List Accessors =============================================================
@@ -127,6 +134,7 @@ public class ModelManager implements Model {
     public void updateFilteredPersonList(Predicate<Person> predicate) {
         requireNonNull(predicate);
         filteredPersons.setPredicate(predicate);
+        this.history.push(this.addressBook);
     }
 
     @Override
@@ -145,7 +153,8 @@ public class ModelManager implements Model {
         ModelManager other = (ModelManager) obj;
         return addressBook.equals(other.addressBook)
                 && userPrefs.equals(other.userPrefs)
-                && filteredPersons.equals(other.filteredPersons);
+                && filteredPersons.equals(other.filteredPersons)
+                && history.equals(other.history);
     }
 
 }
